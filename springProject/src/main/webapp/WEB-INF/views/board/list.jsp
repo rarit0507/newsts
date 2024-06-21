@@ -50,8 +50,11 @@
         <div class="innerOuter" style="padding:5% 10%;">
             <h2>게시판</h2>
             <br>
-            <!-- 로그인 후 상태일 경우만 보여지는 글쓰기 버튼 -->
-            <a class="btn btn-secondary" style="float:right;" href="">글쓰기</a>
+            
+            <!--<c:if test="${ not empty sessionScope.loginUser }"> -->
+            	<!-- 로그인 후 상태일 경우만 보여지는 글쓰기 버튼 -->
+            	<a class="btn btn-secondary" style="float:right;" href="boardForm.do">글쓰기</a>
+            <!-- </c:if> -->
             <br>
             <br>
             <table id="boardList" class="table table-hover" align="center">
@@ -97,9 +100,20 @@
                     <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
                     
                     <c:forEach begin="${ pageInfo.startPage }" end="${ pageInfo.endPage }" var="p">
-                       <li class="page-item">
-                          <a class="page-link" href="boardList?page=${ p }">${ p }</a>
-                       </li>
+                       <c:choose>
+                       <c:when test="${ empty condition }">
+	                       <li class="page-item">
+	                          <a class="page-link" href="boardList?page=${ p }">${ p }</a>
+	                       </li>
+                       </c:when>
+                       <c:otherwise>
+	                       <li class="page-item">
+	                          <a class="page-link" 
+	                          	 href="search.do?page=${ p }&condition=${ condition }&keyword=${keyword}">
+	                          	 ${p }</a>
+	                       </li>
+	                   </c:otherwise>
+	                   </c:choose>
                     </c:forEach>
                     
                     <c:choose>
@@ -129,11 +143,19 @@
                     </select>
                 </div>
                 <div class="text">
-                    <input type="text" class="form-control" name="keyword">
+                    <input type="text" class="form-control" name="keyword" value="${ keyword }">
                 </div>
                 <button type="submit" class="searchBtn btn btn-secondary">검색</button>
             </form>
+            
             <br><br>
+            
+            <script>
+	            $(() => {
+	            	$('#searchForm option[value="${condition }"]').attr('selected',true);
+	            });
+            </script>
+            
         </div>
         <br><br>
 

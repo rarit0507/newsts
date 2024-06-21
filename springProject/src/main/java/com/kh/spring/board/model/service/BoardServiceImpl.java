@@ -41,8 +41,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public int insert(Board board) {
-		// TODO Auto-generated method stub
-		return 0;
+		return boardRepository.insert(sqlSession, board);
 	}
 
 	@Override
