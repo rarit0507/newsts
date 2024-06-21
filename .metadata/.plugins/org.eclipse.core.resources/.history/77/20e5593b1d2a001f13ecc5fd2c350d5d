@@ -1,0 +1,11 @@
+package com.kh.spring.member.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
+
+@Controller
+// 구성 방식에 따라 다름.
+//좀 더 Rest하게 만들고 싶으면 RestController
+public class MemberController {
+
+}

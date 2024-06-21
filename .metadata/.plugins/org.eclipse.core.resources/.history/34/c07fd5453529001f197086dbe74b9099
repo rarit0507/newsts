@@ -1,0 +1,12 @@
+package com.kh.spring.string.run;
+
+public class Run {
+
+	public static void main(String[] args) {
+
+		// HashSet
+		// Value값만 저장, 배열과 달리 index가 존재하지 않음!
+		// 순서보장X, 중복X
+	}
+
+}

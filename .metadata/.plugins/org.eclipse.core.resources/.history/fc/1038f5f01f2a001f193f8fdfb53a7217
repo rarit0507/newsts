@@ -1,0 +1,15 @@
+package com.kh.spring.member.model.service;
+
+import org.springframework.stereotype.Service;
+
+// 비즈니스 로직 구현(가장 중요!)
+@Service
+public class MemberServiceImpl implements MemberService {
+
+	@Override
+	public int returnNum() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

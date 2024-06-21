@@ -1,0 +1,38 @@
+package com.kh.spring.member.model.vo;
+
+import java.sql.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder
+/*
+ * Lombok 사용 시 주의사항!!
+ * 
+ * - 시작글자가 외자인 필드명은 XXXX
+ * ex). 올바른 표기 : productName / X : pName (컨벤션 위반)
+ */
+public class Member {
+
+	private String userId;
+	private String userPwd;
+	private String userName;
+	private String email;
+	private String gender;
+	private String age;
+	private String phone;
+	private String address;
+	private Date enrollDate;	//LocalDateTime형도 있음. String으로 굳이 선언할 필요가??
+	private Date modifyDate;
+	private String status;
+	
+}

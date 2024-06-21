@@ -1,0 +1,9 @@
+package com.kh.spring.member.model.service;
+
+public interface MemberService {
+	//클래스의 사용법을 써두기
+
+	int returnNum();
+	
+	// 기획!
+}

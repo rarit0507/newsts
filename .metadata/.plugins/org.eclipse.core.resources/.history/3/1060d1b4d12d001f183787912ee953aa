@@ -1,0 +1,218 @@
+package com.kh.spring.member.controller;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.kh.spring.member.model.service.MemberService;
+import com.kh.spring.member.model.vo.Member;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@Slf4j
+@RequiredArgsConstructor
+public class MemberController {
+	
+	private final MemberService memberService;
+	
+	/*
+	 *  1. Spring에서 Handler가 요청 시 전달값(Parameter)을 받는 방법
+	 *  
+	 */
+	/*
+	@RequestMapping("login.do")	//RequestMapping 타입의 애노테이션을 붙임으로써 HandlerMapping 등록
+	public String login(HttpServletRequest request) {
+		
+		String userId = request.getParameter("id");		//jsp에서 입력한 input의 name값을 받아옴!!
+		String userPwd = request.getParameter("pwd");
+		
+		log.info("회원이 입력한 아이디 값 : {}", userId);
+		log.info("회원이 입력한 비밀번호 값 : {}", userPwd);
+		
+		return "main";
+	}
+	*/
+	
+	/*
+	 * 
+	 * @RequestParam 애노테이션을 이용하는 방법
+	 * 		request.getParameter("키값")로 밸류를 뽑아오는 역할 대신해주는 애노테이션
+	 * 
+	 * value/name 속성의 값으로 jsp에서 작성했던 name속성값을 적으면 알아서 해당 매개변수로 주입을 해줌
+	 * 만약, 넘어온 값이 비어있는 형태라면 defaultValue 속성으로 기본값을 지정할 수 있음.
+	 */
+	/*
+	@RequestMapping("login.do")
+	public String login(@RequestParam(value="id") String userId,
+						@RequestParam(value="pwd") String userPwd) {
+		
+		log.info("회원이 입력한 아이디 값 : {}", userId);
+		log.info("회원이 입력한 비밀번호 값 : {}", userPwd);
+		
+		return "main";
+	}
+	*/
+	
+	/*
+	 * 3. RequestParam애노테이션을 생략하는 방법
+	 * 
+	 * 단, 매개변수 식별자를 jsp의 name속성값(요청시 전달하는 값의 키값)과 동일하게 작성해주어야만 자동으로 값이 주입됨.
+	 * 단점 : 2.에 사용했던 defaultValue속성을 사용할 수 없음
+	 * 
+	 */
+	/*
+	@RequestMapping("login.do")
+	public String login(String id, String pwd) {
+		
+		log.info("회원이 입력한 아이디 값 : {}", id);
+		log.info("회원이 입력한 비밀번호 값 : {}", pwd);
+		
+		//컨트롤러가 해야 할 일! => 제어
+		// 1. 데이터 가공 -> DTO(만들기?) - 나중에 Service로 넘길 값을 받아둠
+		// 왜 하지?
+		// 업무적 이유? : 여기서 안 적으면 Service에 작성할 내용 증가 -> 실수 가능성 ↑
+		// 기술적 이유? : Repository로 넘길 때, sql문과 인자값 '하나'를 받기 때문에 하나의 객체에 묶어 보냄
+		Member member = new Member();
+		member.setUserId(id);
+		member.setUserPwd(pwd);
+		
+		// 1.5. 서비스 호출
+		memberService.login(id,pwd);
+		
+		// 2. 응답화면 지정 (main.jsp 호출)
+		return "main";
+	}
+	*/
+	
+	/*
+	 * 4. 커맨드 객체 방식 (애초에 가공된 형태를 매개변수에 넣어둠)
+	 * 
+	 * **** 반드시 name속성값과 담고자하는 필드명이 동일해야 함! + setter가 꼭 있어야함! + 기본생성자 필수!!!
+	 * 
+	 * 단, jsp의 input의 id가 내가 주입하고자 하는 클래스의 필드명 그대로 들어가야 함. (직접 주입이라서)
+	 * ex). id="id"(X) / id="userId"(O)
+	 * 
+	 * 해당 메서드의 매개변수로
+	 * 요청 시 전달값을 담고자 하는 클래스의 타입을 지정한 뒤
+	 * 요청 시 전달값의 키값(jsp의 name속성값)을 클래스의 담고자 하는 필드명과 동일하게 작성
+	 * 
+	 * 스프링 컨테이너가 해당 객체를 기본생성자로 생성한 후 내부적으로 setter메소드를 찾아서 요청 시 전달값을 해당 필드에 담아줌(setter injection)
+	 */
+	@RequestMapping("login.do")
+	public String login(Member member) {
+		
+		log.info("가공된 멤버객체 : {}", member);
+		//여기까지가 가공 끝 ! --> 
+		
+		Member loginMember = memberService.login(member);
+		
+		// 자바에서는 대입연산자를 기준으로 왼쪽과 오른쪽의 자료형이 같아야 함 !
+		// 자바에서는 동일한 타입의 값끼리만 연산이 가능함 => 연산의 결과도 동일한 타입이어야 함.
+		
+		// System.out.pringln(1 + 1.1);
+		// 값은 2.1로 나오긴 하나 원칙적으로는 int + double이라 연산 불가. int가 double로 형변환된 것.
+
+		log.info("멤버 확인 : {}", member);
+		
+		return "main";
+	}
+	
+	
+	/* 나중에는 경로 이렇게 설정할 것! for 짜임새 있는 코드 */
+	// localhost/spring  ==>  ??
+	// localhost/spring/member  ==>  회원 관련
+	
+	// 회원 상세 조회 /detail.do
+	//				   localhost/spring			/member/10
+	//@GetMapping
+	// 회원 추가	/insert.do
+	//@PostMapping
+	// 회원 삭제	/delete.do
+	//@DeleteMapping
+	
+	// localhost/spring/notice  => 공지사항 관련
+	// localhost/spring/board  => 게시판 관련
+	
+	// REST방식의 URL 만들기
+	// localhost/spring/member/12
+	/*
+	@GetMapping("/member/{id}")
+	@PutMapping
+	public void restTest(@PathVariable String id) {
+		
+		log.info("앞단에서 넘긴 값 : {}",id);
+	}
+	*/
+	
+	/*
+	 * 요청 처리 후 응답데이터를 담고 응답페이지로 포워딩 또는 리다이렉트 하는 방법
+	 * 
+	 * 1. 스프링에서 제공하는 Model객체를 사용하는 방법
+	 * forwarding할 응답 뷰로 전달하고자 하는 데이터를 Key-Value 형태로 담을 수 있는 영역
+	 * Model객체는 requestScope
+	 */
+	// 여러분들은 화면으로 jsp를 사용하고 있다 !
+	
+	/* 1. String 반환 방식
+	@GetMapping("login.do")
+	public String login(Member member,
+						Model model,
+						HttpSession session) {
+		
+		Member loginUser = memberService.login(member);
+		
+		if(loginUser == null) {	//로그인 실패 ! => 에러문구 requestScope에 담아서 에러페이지로 포워딩
+			
+			model.addAttribute("errorMsg", "로그인 실패");
+			
+			// 포워딩
+			
+			// /WEB-INF/views ~~~.jsp // servlet-context.xml에 접두접미사 설정해놨음
+			// /WEB-INF/views/common/errorPage.jsp
+			
+			// - prefix : /WEB-INF/views/
+			// - suffix : .jsp
+			
+			return "common/errorPage";
+		} else { //로그인 성공 ! => loginUser를 sessionScope에 담고 응답화면
+			
+			session.setAttribute("loginUser", loginUser);	// 이러지마셈(forward 방식 : login시 로그인 한 페이지 내역login.do가 url에 잔존. 새로고침 시 문제)
+			
+			// redirect 방식
+			// /
+			return redirect:/;
+		}
+		
+		// /WEB-INF/views/main.jsp
+		//return "main";
+	}
+	*/
+	
+	/*
+	 * 2. Spring에서 제공하는 ModelAndView 타입을 사용하는 방법
+	 * Model은 데이터를 key-value세트로 담을 수 있는 공간이라고 한다면,
+	 * View는 응답 뷰에 대한 정보를 담을 수 있는 공간
+	 * 
+	 * Model객체와 View가 결합된 형태의 객체
+	 */
+	@PostMapping("login.do")
+	public ModelAndView login(Member member,
+							  ModelAndView mv,
+							  HttpSession session) {
+		System.out.println(member);
+		Member loginUser = memberService.login(member);
+		System.out.println(loginUser);
+		if(loginUser != null) {
+			session.setAttribute("loginUser", loginUser);
+			mv.setViewName("redirect:/");
+		} else {
+			mv.addObject("errorMsg","로그인 실패").setViewName("redirect:/");
+		}
+		return mv;
+	}
+}
