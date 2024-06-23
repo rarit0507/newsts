@@ -1,0 +1,19 @@
+package com.kh.spring.notice.model.repository;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class NoticeRepository {
+
+	public int noticeCount(SqlSessionTemplate sqlSession) {
+		return sqlSession.selectOne("noticeMapper.noticeCount");
+	}
+	
+	public List<Notice> findAll()
+	
+	public int searchCount()
+	
+	public List<Notice> findByConditionAndKeyword()
+	
+	public int insert()
+}

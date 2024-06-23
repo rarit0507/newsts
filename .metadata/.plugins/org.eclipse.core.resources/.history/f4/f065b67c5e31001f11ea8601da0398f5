@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="noticeMapper">
+   
+   <sql id="selectNotice">
+      SELECT
+               NOTICE_NO boardNo,
+               NOTICE_TITLE boardTitle,
+               NOTICE_CONTENT boardContent,
+               NOTICE_WRITER boardWriter,
+               CREATE_DATE createDate,
+   </sql>
+
+   <select id="noticeCount" resultType="_int">   
+      SELECT
+               COUNT(NOTICE_NO)
+        FROM
+               NOTICE
+   </select>
+   
+   <select id="findAll" resultType="notice" parameterType="map">
+   
+   <include refid="selectNotice"/>
+       FROM
+            (SELECT 
+                    NOTICE_NO,
+                    NOTICE_TITLE,
+                    NOTICE_WRITER,
+                    NOTICE_CONTENT,
+                    CREATE_DATE,
+                    ROWNUM RNUM 
+              FROM
+                       (SELECT 
+                             NOTICE_NO,
+                             NOTICE_TITLE,
+                             NOTICE_WRITER,
+                             NOTICE_CONTENT,
+                             CREATE_DATE,
+                        FROM
+                             BOARD
+                       WHERE
+                             STATUS = 'Y'                               
+                       ORDER
+                          BY
+                             NOTICE_NO DESC))               
+WHERE
+      RNUM BETWEEN #{startValue} AND #{endValue} 
+   </select>
+   
+   <select id="searchCount" parameterType="hashmap" resultType="int">
+      SELECT
+              COUNT(NOTICE_NO)
+        FROM
+              NOTICE
+       WHERE
+              STATUS = 'Y'
+        <if test="condition == 'writer'">      
+         AND 
+               NOTICE_WRITER 
+         </if>
+        <if test="condition == 'title'">
+         AND
+              NOTICE_TITLE 
+        </if>
+        <if test="condition == 'content'">
+         AND
+              NOTICE_CONTENT 
+        </if>
+              LIKE '%' || #{keyword} || '%'
+   </select>
+   
+   <!-- 검색 결과-->
+   <select id="findByConditionAndKeyword" parameterType="hashmap" resultType="notice">
+      
+      <include refid="selectNotice"/>
+         FROM
+               BOARD
+        WHERE
+              STATUS = 'Y'
+         <choose>
+            <when test="condition == 'writer'">
+               AND NOTICE_WRITER
+            </when>
+            <when test="condition == 'title'">
+               AND NOTICE_TITLE
+            </when>
+         <otherwise>
+            AND NOTICE_CONTENT
+         </otherwise>
+       </choose>
+              LIKE '%' || #{keyword} || '%'
+         ORDER
+            BY
+              NOTICE_NO DESC
+   </select>
+   
+   <insert id="insert" parameterType="notice">
+      INSERT
+         INTO
+               NOTICE
+               (
+               NOTICE_NO,
+               NOTICE_TITLE,
+               NOTICE_CONTENT,
+               NOTICE_WRITER
+               )
+         VALUES
+               (
+               SEQ_NNO.NEXTVAL,
+               #{noticeTitle},
+               #{noticeContent},
+               #{noticeWriter}
+               )
+   </insert>
+</mapper>

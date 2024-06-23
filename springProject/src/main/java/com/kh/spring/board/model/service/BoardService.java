@@ -34,7 +34,7 @@ public interface BoardService {
 	// 게시글 작성
 	int insert(Board board);
 	
-	// 게시글 상세보기
+// 게시글 상세보기
 	// 조회수 증가
 	int increaseCount(int boardNo);	//성공할 수도, 실패할 수도 있음(눌렀을 때 게시글 삭제 등)
 	

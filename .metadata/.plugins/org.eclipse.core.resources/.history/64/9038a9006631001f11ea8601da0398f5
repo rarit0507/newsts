@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+ <configuration>
+ 	<!-- 설정 태그 -->
+ 	<settings>
+ 		<setting name="jdbcTypeForNull" value="NULL" />
+ 	</settings>
+ 	
+ 	<typeAliases>
+ 		<typeAlias type="com.kh.spring.member.model.vo.Member" alias="member" />
+ 		<typeAlias type="com.kh.spring.board.model.vo.Board" alias="board" />
+ 		<typeAlias type="com.kh.spring.notice.model.vo.Board" alias="notice" />
+ 	</typeAliases>
+ 	<!-- 주의할 점 : 별칭 등록을 하기 위해서는 반드시 해당 클래스가 존재해야 함!!! -->
+ 	<!-- 선 클래스 후 mybatis -->
+ 	<!-- !!!이게 mappers로 이어짐!!! -->
+ 	
+ 	<mappers>
+ 		<mapper resource="/mapper/member-mapper.xml" />
+ 		<mapper resource="/mapper/board-mapper.xml" />
+ 		<mapper resource="/mapper/notice-mapper.xml" />
+ 	</mappers>
+ 	<!-- 주의할 점 ! : 매퍼 파일을 등록하기 위해서는 반드시 해당 경로에 파일이 존재해야 하며 namespace속성값도 존재해야 함 ! -->
+ 	
+ 	<!-- 
+ 		environments(환경구성), dataSource(DB연결정보)
+ 		
+ 		Q. dataSource를 bean으로 등록할 건데, 언제 하는 게 좋을까?
+ 			: 서버 켜짐과 동시에 읽히는 파일(root-context.xml)에 기술할 예정 => Spring Bean
+ 	 -->
+ 	
+ </configuration>
