@@ -132,7 +132,7 @@ public class NoticeController {
    public String insert(Notice notice, Model model) {
         try {
             noticeService.insert(notice);
-            return "redirect:/notice/list";
+            return "redirect:noticeList";
         } catch (Exception e) {
             log.error("Error inserting notice", e);
             model.addAttribute("message", "게시글 등록 중 오류가 발생했습니다.");
