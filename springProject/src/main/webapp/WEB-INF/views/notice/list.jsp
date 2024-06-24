@@ -67,7 +67,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                
+                <!--  onclick="location.href='notice-detail?noticeNo=${ notice.noticeNo }'" -->
                    <c:choose>
                       <c:when test="${list.size() == 0 }">
                          <tr>
@@ -76,7 +76,7 @@
                       </c:when>
                    </c:choose>
                     <c:forEach items="${ list }" var="notice">
-                       <tr>
+                       <tr class="notice-detail" id="${ notice.noticeNo }"  onclick="location.href='notice-detail?noticeNo=${ notice.noticeNo }'">
                           <td>${ notice.noticeNo }</td>
                           <td>${ notice.noticeTitle }</td>
                           <td>${ notice.noticeWriter }</td>
@@ -86,6 +86,44 @@
                 </tbody>
             </table>
             <br>
+            <script>
+               $(() =>{
+                  
+                  // 1번 어떤 친구들을     == eventTarget
+                  // 2번 언제          == eventType
+                  
+                  // console.log($('.board-detail'));
+                  
+                  // .addEventListener() --> 권장 사항
+                  // on이벤트 속성 =
+                  // 익명함수 대입~
+                  // 인라인 방식
+                  
+                  // $
+                  // .on() 메서드 호출하는 방법  --> 권장사항
+                  // 이벤트타입(); 메서드 호출
+                  
+                  $('.board-detail').click(e => {
+                     //alert('hi');
+                     //URL 변경
+                     //console.log(locaion);
+                     
+                     //console.log(e.target);
+                     //console.log(e.currentTarget.id.split('-')[1]);
+                     
+                     console.log(e.currentTarget);
+                     console.log($(e.currentTarger).children().eq(0).text());
+                     // find('선택자') <-- 활용도가 가장 높음
+                     // children()을 사용하기 위해서는 자바스크립트가 아닌 제이쿼리 객체의 메서드이므로 선택자를 제이쿼리로 뽑아온다
+                     
+                     //location.href = 'localhost/spring/notice-detail?boardNo=${notice.noticeNo}';                        
+                  });
+                  //$('.board-detail').on('click', handler())
+                  //console.dir(paginArea);
+                  
+                  
+               });
+            </script>
 
          <div id="pagingArea">
              <ul class="pagination">
@@ -151,7 +189,7 @@
 
             <br clear="both"><br>
 
-            <form id="searchForm" action="search.do" method="get" align="center">
+            <form id="searchForm" action="search" method="get" align="center">
                 <div class="select">
                     <select class="custom-select" name="condition">
                         <option value="writer">작성자</option>

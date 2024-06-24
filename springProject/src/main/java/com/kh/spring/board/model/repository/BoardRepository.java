@@ -40,4 +40,21 @@ public class BoardRepository {
 		return sqlSession.insert("boardMapper.insert", board);
 	}
 	
+	// 조회 수 증가
+	public int increaseCount(SqlSessionTemplate sqlSession, int boardNo) {
+		return sqlSession.update("boardMapper.increaseCount", boardNo);
+	}
+	
+	// 조회 수 증가 후, 게시글 조회
+	public Board findById(SqlSessionTemplate sqlSession, int boardNo) {
+		return sqlSession.selectOne("boardMapper.findById", boardNo);
+	}
+
+	public int delete(SqlSessionTemplate sqlSession, int boardNo) {
+		return sqlSession.update("boardMapper.delete", boardNo);
+	}
+
+	public int update(SqlSessionTemplate sqlSession, Board board) {
+		return sqlSession.update("boardMapper.update", board);
+	}
 }

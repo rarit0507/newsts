@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.session.RowBounds;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.kh.spring.board.model.service.BoardService;
 import com.kh.spring.board.model.vo.Board;
@@ -25,6 +27,7 @@ import com.kh.spring.common.template.PageTemplate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import oracle.jdbc.proxy.annotation.Post;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -304,7 +307,7 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
       if(!upfile.getOriginalFilename().equals("")) {
          
          //   KH_년월일시분초_랜덤값.확장자
-         
+/*
          String originName = upfile.getOriginalFilename();
          
          String ext = originName.substring(originName.lastIndexOf('.'));
@@ -324,7 +327,7 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
          
          String currentTime= new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());         
          
-         String savePath = session.getServletContext().getRealPath("/resources/uploadFiles");
+         String savePath = session.getServletContext().getRealPath("/resources/uploadFiles/");
          
          String changeName = "KH_" + currentTime + "_" + num + ext;
          
@@ -337,14 +340,14 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
          } catch (IOException e) {
             e.printStackTrace();
          }
-         
+*/
          // 첨부파일이 존재한다.
          // 1. 업로드 완료
          // 2. Board객체에 originName + chageName
-         board.setOriginName(originName);
-         board.setChangeName(savePath + changeName);
-         
+         board.setOriginName(upfile.getOriginalFilename());
+         board.setChangeName(saveFile(upfile, session));
       }
+      
       
       // 첨부파일이 존재하지 않을 경우 board : 제목 / 내용 /작성자
       // 첨부파일이 존재할 경우 board : 제목 / 내용 /작성자
@@ -364,16 +367,147 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
       
       // 어쩌고 저쩌고 DB가야한다
       
-      
-      
 //      return "redirect:/boardForm.do";
       
       // 40분 이번 주 업무일지작성 Slack DM으로 제출
       
       // 과제겸 숙제 list.jsp 이전 / 다음 페이지 버튼 완성 해오기
       // Notice테이블을 이용하여 공지사항 전체 목록조회 / 공지사항 작성 기능 완성해오기
-      
    }
    
+
+   // localhost/spring/board-detail?boardNo=???
+   @GetMapping("board-detail")
+   public ModelAndView findByBoardNo(int boardNo,
+		   							 ModelAndView mv) {
+	   
+	   // int abc = Integer.parseInt("123");	//강제형변환이 아니라,,, parsing이다?????
+	   
+	   // Object obj = 123;
+	   // 참조자료형 = 기본자료형 (대입 중임?? X -> 불가능)
+	   // 참조자료형에 대입되는 건 기본자료형이 아니라, 기본자료형이 저장되는 위치의 >>>주소<<<임
+	   
+	   // 1. 데이터 가공 --> 한 개라서 할 게 없네
+	   // 2. 서비스 호출
+	   if(boardService.increaseCount(boardNo) > 0) {	//count수 증가 성공 시
+		   // 3. 응답화면 지정
+		   mv.addObject("board", boardService.findById(boardNo))
+		   .setViewName("board/boardDetail");
+		   
+	   } else {
+		   mv.addObject("errMsg", "게시글 상세조회에 실패했습니다.").setViewName("common/errorPage");
+	   }
+	   return mv;
+   }
+   
+   /*
+    * deleteById : Client(게시글작성자)에게 정수형의 boardNo(BOARD테이블의 PK)를 전달받아서 BOARD테이블의 존재하는 STATUS컬럼의 값을 'N'으로 갱신
+    * 
+    * @param boardNo : 각 행을 식별하기 위한 PK
+    * 
+    * @return : 반환된 View의 논리적인 경로
+    * 
+    * ++
+    * -- 발생오류 & 해결메시지 --
+    */
+   @PostMapping("boardDelete.do")
+   public String deleteById(int boardNo,
+		   					String filePath,
+		   					HttpSession session,
+		   					Model model) {
+	   
+	   if(boardService.delete(boardNo) > 0) {
+		   
+		   if(!"".equals(filePath)) {		//filePath는 null일 가능성 O. 따라서 filePath를 기준으로 잡으면 오타 발생 시 nullPointerException이 발생할 가능성이 있다. 따라서 빈 문자열 ""를 기준으로 .equals 비교를 한다면 nullPointerException 오류 발생은 막을 수 있다.
+			   	new File(session.getServletContext().getRealPath(filePath)).delete();
+		   }
+		   
+		   session.setAttribute("alertMsg", "게시물 삭제 성공");
+		   return "redirect:boardList";
+		   
+	   } else {
+		   model.addAttribute("errorMsg", "게시글 삭제 실패");
+		   return "common/errorPage";
+	   }
+   }
+   
+   @PostMapping("boardUpdateForm.do")
+   public ModelAndView updateForm(ModelAndView mv, int boardNo) {
+	   
+	   mv.addObject("board", boardService.findById(boardNo))
+	   	.setViewName("board/boardUpdate");
+	   return mv;
+   }
+   
+   @PostMapping("board-update.do")
+   public String update(Board board,
+		   				MultipartFile reUpFile,
+		   				HttpSession session) {
+	   
+	   // DB가서 Board 테이블에 UPDATE
+	   
+	   // Board board
+	   /*
+	    * -> boardTitle, boardContent
+	    * -> boardWriter, boardNo (안 바꿈. update와 무관)
+	    * 
+	    * + File
+	    * 
+	    * 1. 기존 첨부파일 X, 새로운 첨부파일 X => 그렇구나
+	    * 
+	    * 2. 기존 첨부파일 O, 새로운 첨부파일 X => origin : 기존 첨부파일 이름, change : 기존 첨부파일 경로
+	    * 
+	    * 3. 기존 첨부파일 X, 새로운 첨부파일 O => origin : 새로운 첨부파일 이름, change : 새로운 첨부파일 경로
+	    * 
+	    * 4. 기존 첨부파일 O, 새로운 첨부파일 O => origin : 새로운 첨부파일 이름, change :  새로운 첨부파일 경로
+	    */
+	   
+	   // => 새로운 첨부파일이 존재하는가? -> reUpFile의 새로운 경로를 담아줘야 함.
+	   if(!reUpFile.getOriginalFilename().equals("")) {	//새로 올린 파일의 원래파일명이 빈문자열과 같지 않다면 = 기존 파일이 존재한다면
+		   
+		   board.setOriginName(reUpFile.getOriginalFilename());
+		   board.setChangeName(saveFile(reUpFile, session));
+	   }
+	   
+	   if(boardService.update(board) > 0) {
+		   
+		   session.setAttribute("alertMsg", "수정 완료");
+		   return "redirect:board-detail?boardNo="+board.getBoardNo();
+		   
+	   } else {
+		   
+		   session.setAttribute("errorMsg", "수정 실패");
+		   return "common/errorPage";
+	   }
+   }
+   
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+// changeName 생성 메서드 만들기
+   public String saveFile(MultipartFile upfile, HttpSession session) {
+	   String originName = upfile.getOriginalFilename();
+       
+       String ext = originName.substring(originName.lastIndexOf('.'));
+       //"abc.ddd.txt"
+       
+       //math * 숫자는 범위이고 뒤에 + 정수는 시작값 소수점을 버리기 위해 int로 형변환
+       int num =(int)(Math.random() * 900) + 100;
+       
+       String currentTime= new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());         
+       
+       String savePath = session.getServletContext().getRealPath("/resources/uploadFiles/");
+       
+       String changeName = "KH_" + currentTime + "_" + num + ext;
+       
+       try {
+          upfile.transferTo(new File(savePath + changeName));
+       } catch (IllegalStateException e) {
+          e.printStackTrace();
+       } catch (IOException e) {
+          e.printStackTrace();
+       }
+       
+       return "resources/uploadFiles/" + changeName;
+    }
 }
 

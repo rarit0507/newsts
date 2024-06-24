@@ -7,12 +7,14 @@
    <!-- 중복되서 작성되는 항목 따로 빼서 selectBoard로 담아줌 -->
    <sql id="selectBoard">
       SELECT
-            BOARD_NO boardNo,
+               BOARD_NO boardNo,
                BOARD_TITLE boardTitle,
                BOARD_CONTENT boardContent,
                BOARD_WRITER boardWriter,
                CREATE_DATE createDate,
-               ORIGIN_NAME originName      
+               ORIGIN_NAME originName,
+               CHANGE_NAME changeName,
+               Count count     
    </sql>
 
    <select id="boardCount" resultType="_int">   <!-- resultType과 parameterType의 차이점? -->
@@ -36,7 +38,8 @@
                      COUNT,
                     CREATE_DATE,
                     ORIGIN_NAME,
-                    ROWNUM RNUM 
+                    ROWNUM RNUM,
+                    CHANGE_NAME
               FROM
                        (SELECT 
                              BOARD_NO,
@@ -45,7 +48,8 @@
                              BOARD_CONTENT,
                              COUNT,
                              CREATE_DATE,
-                             ORIGIN_NAME
+                             ORIGIN_NAME,
+                             CHANGE_NAME
                         FROM
                              BOARD
                        WHERE
@@ -53,8 +57,8 @@
                        ORDER
                           BY
                              BOARD_NO DESC))               
-WHERE
-      RNUM BETWEEN #{startValue} AND #{endValue} 
+					   WHERE
+						      RNUM BETWEEN #{startValue} AND #{endValue} 
    </select>
    
    <select id="searchCount" parameterType="hashmap" resultType="int">
@@ -131,4 +135,46 @@ WHERE
    				#{changeName}
    				)
    </insert>
+   
+   <update id="increaseCount" parameterType="_int">
+   		UPDATE
+   				BOARD
+   		   SET
+   		   		COUNT = COUNT + 1
+   		 WHERE
+   		 		BOARD_NO = #{boardNo}
+   		   AND
+   		   		STATUS = 'Y'
+   </update>
+   
+   <select id="findById" parameterType="_int" resultType="board">
+		<include refid="selectBoard" />
+		 FROM
+				BOARD
+		WHERE
+				STATUS = 'Y'
+		  AND
+				BOARD_NO = #{boardNo}
+   </select>
+   
+   <update id="delete" parameterType="_int">
+   		UPDATE
+   				BOARD
+   		   SET
+   		   		STATUS = 'N'
+   		 WHERE
+   		 		BOARD_NO = #{boardNo}
+   </update>
+   
+   <update id="update" parameterType="board">
+   		UPDATE
+   				BOARD
+   		   SET
+   		   		BOARD_TITLE = #{boardTitle},
+   		   		BOARD_CONTENT = #{boardContent},
+   		   		ORIGIN_NAME = #{originName},
+   		   		CHANGE_NAME = #{changeName}
+   		 WHERE
+   		 		BOARD_NO = #{boardNo}
+   </update>
 </mapper>

@@ -66,7 +66,7 @@ public class Run {
 				//위 2번과 4번이 다 들어감(중복O)
 		
 		
-		System.out.println(new Student("ab",1,1).equals(new Student());
+		System.out.println(new Student("ab",1,1).equals(new Student()));
 		// 이유? 동일객체로 판단하지 않기 때문!
 		//HashSet : 요소가 새롭게 추가될 때마다 equals()와 hashCode()로 비교 후
 		//			둘 다 결과가 true일 경우 동일 객체로 판단
