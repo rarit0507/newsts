@@ -46,6 +46,9 @@ public interface BoardService {
 	
 	// 게시글 수정하기
 	int update(Board board);
+
+	// 사진 조회하기
+	List<Board> selectIamges();
 	
 	// ---------------------------------------- 댓글 관련 (AJAX)
 	

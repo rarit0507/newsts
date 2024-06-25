@@ -45,7 +45,8 @@
                 <div class="form-group">
                     <label for="userId">* ID : </label>
                     <input type="text" class="form-control" id="userId" placeholder="Please Enter ID" name="userId" required> <br>
-
+					<div id="checkResult" style="display:none; font-size=0.7em;"></div>
+					
                     <label for="userPwd">* Password : </label>
                     <input type="password" class="form-control" id="userPwd" placeholder="Please Enter Password" name="userPwd" required> <br>
 
@@ -75,10 +76,56 @@
                 </div> 
                 <br>
                 <div class="btns" align="center">
-                    <button type="submit" class="btn btn-primary">회원가입</button>
+                    <button type="submit" id="join-btn" class="btn btn-primary disabled">회원가입</button>
                     <button type="reset" class="btn btn-danger">초기화</button>
                 </div>
             </form>
+            <script>
+            	$(() => {
+            		
+            		const $idInput = $('.form-group #userId');
+            		const $checkResult = $('#checkResult');
+            		const $joinSubmit = $('#join-btn');
+            		
+            		$idInput.keyup(() => {
+            			
+            			//console.log($inInput.val());
+            			
+            			// 불필요한 DB접근을 제한하기 위해 5글자 이상 입력했을 때만 AJAX 요청을 보내서 체크
+            			if($idInput.val().length >= 5) {
+            				
+            				$.ajax({
+            					url : 'idCheck.do',
+            					type : 'get',
+            					data : {
+            						checkId : $idInput.val()
+            					},
+            					success : response => {		// 응답을 받아오기 위해 response를 매개변수 자리에
+            						
+            						//console.log(response);
+            						// NNNNN/NNNNY
+            						if(response.substr(4) === 'N') {	// 중복이다!!
+            							$checkResult.show().css('color', 'crimson').text('중복입니다!');
+            							$joinSubmit.attr('disabled', true);
+            						}
+            						else {	// 중복이 아니다
+            							$checkResult.show().css('color', 'lightgreen').text('사용 가능합니다!');
+            							$joinSubmit.removeAttr('disabled');
+            						}
+            					},
+            					error : () => {
+            						console.log('AJAX 통신 실패');
+            					}
+            				});
+            			}
+            			else {
+            				$checkResult.hide();
+            				$joinSubmit.attr('disabled', true);
+            			}
+            			
+            		});
+            	});
+            </script>
         </div>
         <br><br>
 

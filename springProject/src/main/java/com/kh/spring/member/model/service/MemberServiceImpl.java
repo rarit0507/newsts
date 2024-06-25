@@ -13,6 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
+	@Override
+	public int idCheck(String checkId) {
+		return memberRepository.idCheck(sqlSession, checkId);
+	}
+
 	private final SqlSessionTemplate sqlSession;
 	private final MemberRepository memberRepository;
 	

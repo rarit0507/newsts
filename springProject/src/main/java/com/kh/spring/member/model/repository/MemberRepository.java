@@ -27,4 +27,8 @@ public class MemberRepository {
 		return sqlSession.update("memberMapper.delete",userId);
 		//탈퇴 번복할 거 대비해서 member.status를 'Y'->'N'으로 바꿔주기만
 	}
+
+	public int idCheck(SqlSessionTemplate sqlSession, String checkId) {
+		return sqlSession.selectOne("memberMapper.idCheck", checkId);
+	}
 }

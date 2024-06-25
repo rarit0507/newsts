@@ -509,5 +509,13 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
        
        return "resources/uploadFiles/" + changeName;
     }
+   
+   @GetMapping("imageList")
+   public String images(Model model) {
+	   
+	   //List<Board> images = boardService.selectIamges();
+	   model.addAttribute("board", boardService.selectIamges());
+	   return "board/imageList";
+   }
 }
 

@@ -88,4 +88,14 @@
 	<!-- get할 때는 변수명 제대로 넣어야 하는데, -->
 	<!-- mybatis많이 해 봐야., 뭔소리임 -->
 	<!-- #{abc}만 써 놓아도 들어오는 값을 문자열로 알아서 알아먹음 -->
+	
+	<!-- 아이디 중복체크용 쿼리문 -->
+	<select id="idCheck" parameterType="String" resultType="_int">
+		SELECT
+				COUNT(*)
+		  FROM
+		  		MEMBER
+		 WHERE
+		 		USER_ID = #{checkId}
+	</select>
 </mapper>

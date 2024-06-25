@@ -21,6 +21,7 @@ public interface MemberService {
 	int delete(String userId);
 	
 	// 아이디 중복체크(SELECT)
+	public int idCheck(String checkId);
 	
 	// 메일인증
 }
