@@ -113,17 +113,41 @@
             <!-- 댓글 기능은 나중에 ajax 배우고 나서 구현할 예정! 우선은 화면구현만 해놓음 -->
             <table id="replyArea" class="table" align="center">
                 <thead>
-                    <tr>
-                        <th colspan="2">
-                            <textarea class="form-control" name="" id="content" cols="55" rows="2" style="resize:none; width:100%;"></textarea>
-                        </th>
-                        <th style="vertical-align:middle"><button class="btn btn-secondary">등록하기</button></th> 
-                    </tr>
-                    <tr>
-                        <td colspan="3">댓글(<span id="rcount">3</span>)</td>
-                    </tr>
+                
+                	<c:choose>
+                		<c:when test="${ empty sessionScope.loginUser }" >
+		                    <tr>
+		                        <th colspan="2">
+		                            <textarea class="form-control"
+		                    			      cols="55" 
+		                    			      rows="2" 
+		                    			      style="resize:none; 
+		                    			      width:100%;">로그인 후 이용 가능합니다.</textarea>
+		                        </th>
+		                        <th style="vertical-align:middle"><button class="btn btn-secondary">등록하기</button></th> 
+		                    </tr>
+                    	</c:when>
+                    	
+                    	<c:otherwise>
+		                    <tr>
+		                    	<th colspan="2">
+		                            <textarea class="form-control"
+		                            		  id="content"
+		                    			      cols="55" 
+		                    			      rows="2" 
+		                    			      style="resize:none; 
+		                    			      width:100%;"></textarea>
+		                        </th>
+		                        <th style="vertical-align:middle"><button onclick="saveReply();" class="btn btn-secondary">등록하기</button></th> 
+		                    </tr>
+	                    </c:otherwise>
+                    </c:choose>
+               		<tr>
+                    	<td colspan="3">댓글(<span id="rcount">0</span>)</td>
+            		</tr>
                 </thead>
                 <tbody>
+                <!-- 
                     <tr>
                         <th>user02</th>
                         <td>ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ꿀잼</td>
@@ -139,12 +163,80 @@
                         <td>댓글입니다!!</td>
                         <td>2023-03-10</td>
                     </tr>
+                     -->
                 </tbody>
             </table>
         </div>
         <br><br>
 
     </div>
+    
+    <script>
+    
+    $(() =>{
+    	selectReply();
+    })
+    function saveReply() {
+    
+    	if( $('#content').val().trim() != '') {
+    		
+    		$.ajax({
+    			url : 'reply',
+    			data : {	// 자바와 자바스크립트 코드가 혼재됨.
+    				refBoardNo :${ board.boardNo },		//EL(자바)
+    				replyContent : $('#content').val(),	//jquery 선택자(자바스크립트)
+    				replyWriter : '${ sessionScope.loginUser.userId }'
+    				// => 자바는 서버에서 만들어진 값을, 스크립트는 클라이언트 요청 시 들어오는 값을 전달.
+    				// => 타입이 중요!!!!!
+    			},
+    			type : 'post',
+    			success : result => {
+    				
+    				// console.log(result);
+    				if(result == 'success') {
+    					
+    					selectReply();
+    					$('#content').val('');
+    				}
+    			}
+    		});
+    	}
+    	else {
+    		
+    		alertify.alert('작작해라');
+    	}
+    }
+    
+    
+    function selectReply() {
+    	
+    	$.ajax({
+    		url : 'reply',	
+    	 	type : 'get',
+    	 	data : {
+    			boardNo : ${ board.boardNo }
+    		},
+    		success : result => {
+    			
+    			// console.log(result);
+    			
+    			let resultStr = '';
+    			
+    			for(let i in result) {
+    				
+    				resultStr += '<tr>'
+    						   + '<td>'+ result[i].replyWriter + '</td>'	//1. 객체명을 쓴다, 2. 점을 찍는다, 3.필드명을 쓴다
+    						   + '<td>'+ result[i].replyContent + '</td>'
+    						   + '<td>'+ result[i].createDate + '</td>'
+    						   + '</tr>';
+    			}
+
+    			$('#replyArea tbody').html(resultStr);
+    			$('#rcount').text(result.length);
+    		}
+    	});
+    }
+    </script>
     
     <jsp:include page="../common/footer.jsp" />
     

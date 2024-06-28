@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.session.RowBounds;
@@ -16,18 +15,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.Gson;
 import com.kh.spring.board.model.service.BoardService;
 import com.kh.spring.board.model.vo.Board;
+import com.kh.spring.board.model.vo.Reply;
 import com.kh.spring.common.model.vo.PageInfo;
 import com.kh.spring.common.template.PageTemplate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import oracle.jdbc.proxy.annotation.Post;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -516,6 +518,31 @@ b      PageInfo pageInfo = PageInfo.builder().pageLimit(pageLimit)
 	   //List<Board> images = boardService.selectIamges();
 	   model.addAttribute("board", boardService.selectIamges());
 	   return "board/imageList";
+   }
+   
+   @ResponseBody
+   @GetMapping(value="reply", produces="application/json; charset=UTF-8")
+   public String selevtReply(int boardNo) {
+	   return new Gson().toJson(boardService.selectReply(boardNo));
+   }
+   
+   @ResponseBody
+   @PostMapping("reply")
+   public String saveReply(Reply reply) {
+	   //boardService.insertReply(reply);
+	   return boardService.insertReply(reply) > 0 ? "success" : "fail";
+   }
+   
+   @ResponseBody	//함 화면에 JSON으로 찍어보자
+   @GetMapping("board-reply")
+   public Board boardAndReply(int boardNo) {
+	   return boardService.boardAndReply(boardNo);
+   }
+   //localhost/spring/board-reply?boardNo=60
+   
+   @GetMapping("var")
+   public String varForward() {
+	   return "common/variable";
    }
 }
 
