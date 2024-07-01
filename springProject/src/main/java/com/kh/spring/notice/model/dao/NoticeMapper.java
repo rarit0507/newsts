@@ -21,4 +21,6 @@ public interface NoticeMapper {
 	int update(Notice notice);
 	
 	int delete(int noticeNo);
+
+
 }
