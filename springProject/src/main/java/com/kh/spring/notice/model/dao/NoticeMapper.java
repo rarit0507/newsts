@@ -22,5 +22,4 @@ public interface NoticeMapper {
 	
 	int delete(int noticeNo);
 
-
 }
