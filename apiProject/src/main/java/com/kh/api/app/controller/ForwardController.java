@@ -31,4 +31,9 @@ public class ForwardController {
 		return "busan/busan";
 	}
 	
+	@GetMapping("kakaoLogin")
+	public String kakaoLogin() {
+		return "kakao/kakao-login";
+	}
+	
 }

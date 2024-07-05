@@ -2,6 +2,7 @@ package com.kh;
 
 public class AbcController {
 	{
+		/*
 		  "response": {
 		    "body": {
 		      "totalCount": 40,
@@ -1015,5 +1016,6 @@ public class AbcController {
 		      "resultCode": "00"
 		    }
 		  }
+		  */
 		}
 }

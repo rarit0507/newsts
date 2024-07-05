@@ -8,7 +8,6 @@ public class Student {
 	
 	//기본생성자
 	public Student() {
-		super();
 	}
 	
 	// 초기값 생성자

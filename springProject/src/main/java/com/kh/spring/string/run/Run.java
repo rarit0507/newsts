@@ -63,7 +63,7 @@ public class Run {
 		System.out.println(students);
 		// 저장 순서 보장 X, 중복 저장 X
 		//	-> 중복 저장 O
-				//위 2번과 4번이 다 들어감(중복O)
+				//위 2번과 4번이 다 들어감(중복O)des = des.replaceAll("\r", "");
 		
 		
 		System.out.println(new Student("ab",1,1).equals(new Student()));
